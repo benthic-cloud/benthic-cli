@@ -60,6 +60,8 @@ brews:
     repository:
       owner: benthic-cloud
       name: homebrew-benthic
+    folder: Formula
+    url_template: "https://github.com/benthic-cloud/benthic-cli/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
     description: "CLI for interacting with Benthic Cloud"
     test: |
       system "#{bin}/benthic --version"
