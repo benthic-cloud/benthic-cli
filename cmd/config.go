@@ -67,8 +67,8 @@ func initConfig(cmd *cobra.Command, args []string) {
 		log.Println("Directory created successfully:", newPath)
 	}
 
-	// If the config file doesn't exist at ~/.benthic/config.yml, create it using the defaultNewConfig struct.
-	newPath = filepath.Join(newPath, "config.yml")
+	// If the config file doesn't exist at ~/.benthic/config.yaml, create it using the defaultNewConfig struct.
+	newPath = filepath.Join(newPath, "config.yaml")
 
 	writeToYAML(defaultNewConfig, newPath)
 
@@ -79,7 +79,7 @@ func initConfig(cmd *cobra.Command, args []string) {
 
 var initCmd = &cobra.Command{
 	Use:   "init",
-	Short: "Initialize configuration file at ~/.benthic/config.yml",
+	Short: "Initialize configuration file at ~/.benthic/config.yaml",
 	Run:   initConfig,
 }
 
