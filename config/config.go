@@ -10,6 +10,9 @@ type Profile struct {
 
 // Config represents the config file
 type Config struct {
+	// Benthic Cloud API endpoint
+	Endpoint string
+
 	// List of profiles
 	Profiles []Profile
 }
