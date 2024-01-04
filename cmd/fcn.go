@@ -48,8 +48,7 @@ func makePostRequest(url, apiKey string, body []byte) (*http.Response, error) {
 }
 
 func run(cmd *cobra.Command, args []string) {
-	fmt.Println("Running function...")
-
+	
 	// Load the configuration
 	cfg, err := config.LoadConfig()
 	if err != nil {

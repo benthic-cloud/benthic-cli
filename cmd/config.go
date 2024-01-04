@@ -71,6 +71,10 @@ func initConfig(cmd *cobra.Command, args []string) {
 	// If the config file doesn't exist at ~/.benthic/config.yaml, create it using the defaultNewConfig struct.
 	newPath = filepath.Join(newPath, "config.yaml")
 
+	apiKey := cmd.Flag("api-key").Value.String()
+
+	defaultNewConfig.Profiles[0].APIKey = apiKey
+
 	writeToYAML(defaultNewConfig, newPath)
 
 	if err != nil {
@@ -85,6 +89,9 @@ var initCmd = &cobra.Command{
 }
 
 func init() {
+	// Add --api-key flag to init command
+	initCmd.Flags().StringP("api-key", "", "REPLACE_ME", "API key to initialize with")
+
 	configCmd.AddCommand(initCmd)
 	RootCmd.AddCommand(configCmd)
 }
