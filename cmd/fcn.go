@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/spf13/cobra"
+	"io/ioutil"
 	"net/http"
 )
 
@@ -17,6 +18,12 @@ var runCmd = &cobra.Command{
 	Use:   "run",
 	Short: "Run a function",
 	Run:   run,
+}
+
+var logsCmd = &cobra.Command{
+	Use:   "logs",
+	Short: "Get the logs for a function",
+	Run:   logs,
 }
 
 // Define a shared HTTP client
@@ -81,13 +88,59 @@ func run(cmd *cobra.Command, args []string) {
 	fmt.Printf("%s\n", bodyString)
 }
 
-func init() {
-	// Add the run command to the fcn command
-	runCmd.Flags().StringP("image", "i", "", "public Docker image to run")
-	// Add an env flag to the run command
-	runCmd.Flags().StringP("env", "e", "[]", "JSON variables to pass to the function")
+// logs function to handle 'logs' command
+func logs(cmd *cobra.Command, args []string) {
+	// Load the configuration
+	cfg, err := config.LoadConfig()
+	if err != nil {
+		fmt.Printf("Error loading config: %v\n", err)
+		return // Exit the function if config loading fails
+	}
 
+	functionID := cmd.Flag("function-id").Value.String()
+
+	apiKey := cfg.Profiles[0].APIKey // Assuming you want to use the first profile
+
+	// Define the URL
+	url := fmt.Sprintf("%s/fcn/logs/%s", cfg.Endpoint, functionID)
+
+	// Create a new HTTP request
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		fmt.Printf("Error creating the request: %s\n", err.Error())
+		return
+	}
+
+	// Add apikey to the request headers
+	req.Header.Set("apikey", apiKey)
+
+	// Send the request
+	response, err := http.DefaultClient.Do(req)
+	if err != nil {
+		fmt.Printf("Error making the request: %s\n", err.Error())
+		return
+	}
+	defer response.Body.Close()
+
+	// Read the response body
+	bodyBytes, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		fmt.Printf("Error reading response: %s\n", err.Error())
+		return
+	}
+
+	// Convert the body to a string and print
+	bodyString := string(bodyBytes)
+	fmt.Printf("%s\n", bodyString)
+}
+
+func init() {
+	runCmd.Flags().StringP("image", "i", "", "public Docker image to run")
+	runCmd.Flags().StringP("env", "e", "[]", "JSON variables to pass to the function")
 	fcnCmd.AddCommand(runCmd)
+
+	logsCmd.Flags().StringP("function-id", "i", "", "ID of the function to get logs for")
+	fcnCmd.AddCommand(logsCmd)
 
 	RootCmd.AddCommand(fcnCmd)
 }
