@@ -58,8 +58,11 @@ func run(cmd *cobra.Command, args []string) {
 	apiPath := "fcn/start"
 	fullURL := endpoint + apiPath
 
-	// Assuming an empty JSON body '{}' for the POST request
-	body := []byte("{}")
+	image := cmd.Flag("image").Value.String()
+	env := cmd.Flag("env").Value.String()
+
+	// Create the JSON body
+	body := []byte(fmt.Sprintf(`{"image":"%s", "env":%s}`, image, env))
 
 	// Make the POST request
 	response, err := makePostRequest(fullURL, apiKey, body)
@@ -69,11 +72,22 @@ func run(cmd *cobra.Command, args []string) {
 	}
 	defer response.Body.Close()
 
+	// Read the response body into a string
+	buf := new(bytes.Buffer)
+	buf.ReadFrom(response.Body)
+	bodyString := buf.String()
+
 	// Handle the response...
-	fmt.Printf("Response Status: %s\n", response.Status)
+	fmt.Printf("%s\n", bodyString)
 }
 
 func init() {
+	// Add the run command to the fcn command
+	runCmd.Flags().StringP("image", "i", "", "public Docker image to run")
+	// Add an env flag to the run command
+	runCmd.Flags().StringP("env", "e", "[]", "JSON variables to pass to the function")
+
 	fcnCmd.AddCommand(runCmd)
+
 	RootCmd.AddCommand(fcnCmd)
 }
