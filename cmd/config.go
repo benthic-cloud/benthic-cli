@@ -17,7 +17,7 @@ var configCmd = &cobra.Command{
 }
 
 var defaultNewConfig = config.Config{
-	Endpoint: "https://benthic.cloud/api/",
+	Endpoint: "https://api.benthic.cloud/",
 	Profiles: []config.Profile{
 		{
 			Name:   "default",
